@@ -13,11 +13,13 @@
 #include <pcl/segmentation/extract_clusters.h>
 #include <pcl/common/transforms.h>
 #include <iostream> 
+#include <unordered_set>
 #include <string>  
 #include <vector>
 #include <ctime>
 #include <chrono>
 #include "render/box.h"
+#include "./quiz/cluster/kdtree.h"
 
 template<typename PointT>
 class ProcessPointClouds {
@@ -35,6 +37,13 @@ public:
     std::pair<typename pcl::PointCloud<PointT>::Ptr, typename pcl::PointCloud<PointT>::Ptr> SeparateClouds(pcl::PointIndices::Ptr inliers, typename pcl::PointCloud<PointT>::Ptr cloud);
 
     std::pair<typename pcl::PointCloud<PointT>::Ptr, typename pcl::PointCloud<PointT>::Ptr> SegmentPlane(typename pcl::PointCloud<PointT>::Ptr cloud, int maxIterations, float distanceThreshold);
+
+    std::unordered_set<int> segmentUsingRansac(typename pcl::PointCloud<PointT>::Ptr cloud, int maxIterations, float distanceThreshold);
+
+    std::vector<std::vector<float>> getPointsV(typename pcl::PointCloud<PointT>::Ptr cloud);
+    void proximityImpl(const std::vector<std::vector<float>>& points, int id, std::vector<int>& cluster, KdTree *tree, std::map<int, bool>& pointsProcessed, float distanceTol);
+    std::vector<std::vector<int>> euclideanClusterImpl(const std::vector<std::vector<float>>& points, KdTree* tree, float distanceTol);
+    std::vector<typename pcl::PointCloud<PointT>::Ptr> ClusteringCustomImpl(typename pcl::PointCloud<PointT>::Ptr cloud, float clusterTolerance, int minSize, int maxSize);
 
     std::vector<typename pcl::PointCloud<PointT>::Ptr> Clustering(typename pcl::PointCloud<PointT>::Ptr cloud, float clusterTolerance, int minSize, int maxSize);
 
